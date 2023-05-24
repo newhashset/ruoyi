@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--根节点-->
+<configuration>
+    <!--1.通用配置-->
+    <settings>
+        <!--必加-->
+        <!--开启日志: 可以将mybatis运行过程通过日志打印控制台-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+
+    </settings>
+    <!--2.插件配置（可选的） 可以给spring配置 -->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="offsetAsPageNum" value="true" />
+            <property name="rowBoundsWithCount" value="true" />
+            <!--pageSize=0时，是否查询出全部结果，默认为false-->
+            <property name="pageSizeZero" value="true" />
+            <!--分页合理化参数，默认文false；pageNum<=0，查询第一页；pageNum>总页数，查询最后一页-->
+            <property name="reasonable" value="true" />
+            <property name="params"
+                      value="pageNum=pageHelperStart;pageSize=pageHelperRows;" />
+            <property name="supportMethodsArguments" value="false" />
+            <property name="returnPageInfo" value="none" />
+        </plugin>
+    </plugins>
+
+</configuration>

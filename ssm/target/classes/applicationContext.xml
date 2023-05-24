@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       <!--1.配置扫描包(只能扫描service)-->
+       <context:component-scan base-package="com.sc.service"/>
+
+       <!--2..加载jdbc配置文件-->
+       <context:property-placeholder location="classpath:jdbc.properties"/>
+
+       <!--3.配置数据源 SSM项目配置德鲁伊连接池-->
+       <bean id="dataSource"
+             class="com.alibaba.druid.pool.DruidDataSource"
+             init-method="init"
+             destroy-method="close">
+              <property name="url" value="${jdbc.url}"/>
+              <property name="driverClassName" value="${jdbc.driver}"/>
+              <property name="username" value="${jdbc.username}"/>
+              <property name="password" value="${jdbc.password}"/>
+              <!--可选属性-->
+              <!--初始连接大小-->
+              <property name="initialSize" value="5"/>
+              <!--最小连接数量-->
+              <property name="minIdle" value="5"/>
+              <!--最大连接数量-->
+              <property name="maxActive" value="20"/>
+              <!--最大等待时间 毫秒-->
+              <property name="maxWait" value="60000"/>
+              <!--最大空闲时间 毫秒-->
+              <property name="minEvictableIdleTimeMillis" value="300000"/>
+              <!--验证连接是否启用 开启true-->
+              <property name="testWhileIdle" value="true"/>
+              <!--验证连接-->
+              <property name="validationQuery" value="select 1"/>
+       </bean>
+
+       <!--4.创建事务管理类对象-->
+       <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+              <!--需要管理数据源-->
+              <property name="dataSource" ref="dataSource"/>
+       </bean>
+
+       <!--5.开启事务注解-->
+       <tx:annotation-driven transaction-manager="transactionManager"/>
+
+       <!--6.整合mybatis(关联核心配置文件 和配置文件)-->
+ <!--      <bean id="SqlSessionFactory " class="org.mybatis.spring.SqlSessionFactoryBean">
+              &lt;!&ndash;注入数据源&ndash;&gt;
+              <property name="dataSource" ref="dataSource"/>
+              &lt;!&ndash;注入mybatis核心配置文件&ndash;&gt;
+              <property name="configLocation" value="classpath:mybatis.xml"/>
+              &lt;!&ndash;注入映射文件(可能会出现很多个) 可能会出现bug 可能不会识别其他目录的映射文件&ndash;&gt;
+              &lt;!&ndash;mapper接口和映射文件在同一个目录下才会识别&ndash;&gt;
+              <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+
+       </bean>-->
+       <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+              <property name="dataSource" ref="dataSource"/>
+              <property name="configLocation" value="classpath:mybatis.xml"/>
+              <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+       </bean>
+
+       <!--7.整合mapper接口-->
+       <!--<bean id="scannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+              &lt;!&ndash;注入mapper接口的包&ndash;&gt;
+              <property name="basePackage" value="com.sc.mapper"/>
+              &lt;!&ndash;注入sqlsession工厂&ndash;&gt;
+              <property name="sqlSessionFactoryBeanName" value="SqlSessionFactory"/>
+       </bean>-->
+       <bean id="scannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+              <property name="basePackage" value="com.sc.mapper"/>
+              <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+       </bean>
+</beans>
